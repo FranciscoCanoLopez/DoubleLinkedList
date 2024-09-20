@@ -16,8 +16,8 @@ namespace WinFormsApp1
         private void InitializeListView()
         {
             lvDisplay.View = View.Details;
-            lvDisplay.Columns.Add("Posición", 200, HorizontalAlignment.Left);
-            lvDisplay.Columns.Add("Dato", 200, HorizontalAlignment.Left);
+            lvDisplay.Columns.Add("Posición", 100, HorizontalAlignment.Left);
+            lvDisplay.Columns.Add("Dato", 150, HorizontalAlignment.Left);
         }
 
         private void btnInsertStart_Click(object sender, EventArgs e)
@@ -104,6 +104,7 @@ namespace WinFormsApp1
                 temp = temp.Next;
                 position++;
             }
+
         }
     }
 }
