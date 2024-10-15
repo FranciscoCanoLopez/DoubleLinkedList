@@ -12,160 +12,82 @@ namespace WinFormsApp1
             head = null!;
         }
 
-        // Método para insertar un nodo al principio de la lista.
-        public void InsertAtStart(int data)
+        // Método para agregar un nodo manteniendo el orden numérico ascendente.
+        public void Add(int data)
         {
-            Node newNode = new Node(data); // Crear un nuevo nodo con el dato.
-            if (head != null) // Si la lista no está vacía:
-            {
-                newNode.Next = head; // El siguiente del nuevo nodo será la antigua cabeza.
-                head.Prev = newNode; // El nodo anterior de la antigua cabeza será el nuevo nodo.
-            }
-            head = newNode; // El nuevo nodo se convierte en la nueva cabeza de la lista.
-        }
+            Node newNode = new Node(data);
 
-        // Método para insertar un nodo al final de la lista.
-        public void InsertAtEnd(int data)
-        {
-            Node newNode = new Node(data); // Crear un nuevo nodo con el dato.
-            if (head == null) // Si la lista está vacía:
+            if (head == null || head.Data >= data) // Insertar al inicio si está vacía o el valor es menor.
             {
-                head = newNode; // El nuevo nodo es la cabeza de la lista.
+                newNode.Next = head!;
+                if (head != null) head.Prev = newNode;
+                head = newNode;
             }
             else
             {
-                Node temp = head;
-                // Recorrer la lista hasta el último nodo.
-                while (temp.Next != null)
+                Node current = head;
+                while (current.Next != null && current.Next.Data < data)
                 {
-                    temp = temp.Next;
+                    current = current.Next;
                 }
-                temp.Next = newNode; // Enlazar el último nodo con el nuevo nodo.
-                newNode.Prev = temp; // El nodo anterior del nuevo nodo será el anterior último nodo.
+
+                newNode.Next = current.Next!;
+                if (current.Next != null) current.Next.Prev = newNode;
+                current.Next = newNode;
+                newNode.Prev = current;
             }
         }
 
-        // Método para insertar un nodo en una posición específica.
-        public void InsertAtMiddle(int data, int position)
-        {
-            if (position == 1) // Si la posición es 1, insertar al inicio.
-            {
-                InsertAtStart(data);
-                return;
-            }
-
-            Node newNode = new Node(data); // Crear un nuevo nodo con el dato.
-            Node temp = head;
-
-            // Recorrer la lista hasta la posición deseada (o la más cercana si no existe).
-            for (int i = 1; temp != null && i < position - 1; i++)
-            {
-                temp = temp.Next;
-            }
-
-            if (temp == null) // Si se alcanzó el final de la lista, insertar al final.
-            {
-                InsertAtEnd(data);
-                return;
-            }
-
-            // Insertar el nuevo nodo entre temp y el siguiente nodo.
-            newNode.Next = temp.Next; // El siguiente del nuevo nodo es el siguiente de temp.
-            newNode.Prev = temp; // El anterior del nuevo nodo es temp.
-
-            if (temp.Next != null) // Si hay un nodo después de temp, ajustar su nodo anterior.
-            {
-                temp.Next.Prev = newNode;
-            }
-            temp.Next = newNode; // Enlazar temp con el nuevo nodo.
-        }
-
-        // Método para eliminar el primer nodo de la lista.
-        public void DeleteFromStart()
+        // Método para eliminar un nodo por su valor.
+        public void Delete(int data)
         {
             if (head == null) // Si la lista está vacía, no hacer nada.
-            {
                 return;
+
+            Node current = head;
+
+            // Buscar el nodo con el valor especificado.
+            while (current != null && current.Data != data)
+            {
+                current = current.Next;
             }
 
-            if (head.Next != null) // Si hay más de un nodo en la lista:
+            if (current == null) // Si no se encontró el valor, salir.
+                return;
+
+            // Ajustar los punteros de los nodos adyacentes.
+            if (current.Prev != null)
             {
-                head = head.Next; // La nueva cabeza es el siguiente nodo.
-                head.Prev = null!; // El nodo anterior de la nueva cabeza es nulo.
+                current.Prev.Next = current.Next;
             }
             else
             {
-                head = null!; // Si solo había un nodo, la lista queda vacía.
+                head = current.Next; // Si el nodo a eliminar es la cabeza, mover la cabeza.
+            }
+
+            if (current.Next != null)
+            {
+                current.Next.Prev = current.Prev!;
             }
         }
 
-        // Método para eliminar el último nodo de la lista.
-        public void DeleteFromEnd()
+        // Método para buscar un número en la lista.
+        public bool Search(int data)
         {
-            if (head == null) // Si la lista está vacía, no hacer nada.
-            {
-                return;
-            }
+            Node current = head;
 
-            if (head.Next == null) // Si solo hay un nodo:
+            // Recorrer la lista buscando el dato.
+            while (current != null)
             {
-                head = null!; // Eliminar el nodo y dejar la lista vacía.
+                if (current.Data == data)
+                    return true;
+                current = current.Next;
             }
-            else
-            {
-                Node temp = head;
-                // Recorrer la lista hasta el último nodo.
-                while (temp.Next != null)
-                {
-                    temp = temp.Next;
-                }
-                temp.Prev.Next = null!; // Eliminar el enlace al último nodo.
-            }
+            return false; // Retornar false si no se encontró el dato.
         }
-
-        // Método para eliminar un nodo en una posición específica.
-        public void DeleteFromMiddle(int position)
-        {
-            if (head == null) // Si la lista está vacía, no hacer nada.
-            {
-                return;
-            }
-
-            if (position == 1) // Si la posición es 1, eliminar desde el inicio.
-            {
-                DeleteFromStart();
-                return;
-            }
-
-            Node temp = head;
-
-            // Recorrer la lista hasta la posición deseada.
-            for (int i = 1; temp != null && i < position; i++)
-            {
-                temp = temp.Next;
-            }
-
-            if (temp == null) // Si no se encontró la posición, no hacer nada.
-            {
-                return;
-            }
-
-            // Ajustar los punteros de los nodos adyacentes para eliminar temp.
-            if (temp.Next != null) // Si hay un nodo después de temp:
-            {
-                temp.Next.Prev = temp.Prev;
-            }
-
-            if (temp.Prev != null) // Si hay un nodo antes de temp:
-            {
-                temp.Prev.Next = temp.Next!; // Saltarse el nodo temp.
-            }
-        }
-
-        // Método para obtener la cabeza de la lista.
         public Node GetHead()
         {
-            return head; // Devolver la cabeza de la lista.
+            return head;
         }
     }
 }

@@ -5,106 +5,81 @@ namespace WinFormsApp1
 {
     public partial class Form1 : Form
     {
-        private DoublyLinkedList list = new DoublyLinkedList();
+        private DoublyLinkedList list = new DoublyLinkedList(); // Lista doblemente enlazada.
 
         public Form1()
         {
             InitializeComponent();
-            InitializeListView();
         }
 
-        private void InitializeListView()
+        private void btnAgg_Click(object sender, EventArgs e)
         {
-            lvDisplay.View = View.Details;
-            lvDisplay.Columns.Add("Posición", 100, HorizontalAlignment.Left);
-            lvDisplay.Columns.Add("Dato", 150, HorizontalAlignment.Left);
+            if (int.TryParse(txtData.Text, out int value))
+            {
+                list.Add(value); // Agregar en orden numérico.
+                UpdateListView(); // Actualizar el ListView.
+                MessageBox.Show($"Se agregó {value} a la lista.");
+            }
+            else
+            {
+                MessageBox.Show("Por favor, ingrese un valor numérico válido.");
+            }
+            txtData.Clear(); // Limpiar el TextBox.
         }
 
-        private void btnInsertStart_Click(object sender, EventArgs e)
+        private void btnDelete_Click(object sender, EventArgs e)
         {
-            try
+            if (int.TryParse(txtData.Text, out int value))
             {
-                int data = int.Parse(txtData.Text);
-                list.InsertAtStart(data);
-                UpdateDisplay();
+                list.Delete(value); // Eliminar el nodo con el valor.
+                UpdateListView(); // Actualizar el ListView.
+                MessageBox.Show($"Se eliminó {value} de la lista (si existía).");
             }
-            catch (FormatException)
+            else
             {
-                MessageBox.Show("Por favor, ingrese un número válido.");
+                MessageBox.Show("Por favor, ingrese un valor numérico válido.");
             }
+            txtData.Clear(); // Limpiar el TextBox.
         }
 
-        private void btnInsertEnd_Click(object sender, EventArgs e)
+        private void btnSearch_Click(object sender, EventArgs e)
         {
-            try
+            if (int.TryParse(txtData.Text, out int value))
             {
-                int data = int.Parse(txtData.Text);
-                list.InsertAtEnd(data);
-                UpdateDisplay();
+                bool found = list.Search(value); // Buscar el valor.
+                if (found)
+                    MessageBox.Show($"El número {value} se encuentra en la lista.");
+                else
+                    MessageBox.Show($"El número {value} no se encuentra en la lista.");
             }
-            catch (FormatException)
+            else
             {
-                MessageBox.Show("Por favor, ingrese un número válido.");
+                MessageBox.Show("Por favor, ingrese un valor numérico válido.");
             }
+            txtData.Clear(); // Limpiar el TextBox.
         }
 
-        private void btnInsertMiddle_Click(object sender, EventArgs e)
+        private void UpdateListView()
         {
-            try
-            {
-                int data = int.Parse(txtData.Text);
-                int position = int.Parse(txtPosition.Text);
-                list.InsertAtMiddle(data, position);
-                UpdateDisplay();
-            }
-            catch (FormatException)
-            {
-                MessageBox.Show("Por favor, ingrese números válidos.");
-            }
-        }
+            lvDisplay.Items.Clear(); // Limpiar el ListView.
+            Node current = list.GetHead(); // Obtener la cabeza de la lista.
+            int position = 1; // Iniciar la posición desde 1.
 
-        private void btnDeleteStart_Click(object sender, EventArgs e)
-        {
-            list.DeleteFromStart();
-            UpdateDisplay();
-        }
-
-        private void btnDeleteEnd_Click(object sender, EventArgs e)
-        {
-            list.DeleteFromEnd();
-            UpdateDisplay();
-        }
-
-        private void btnDeleteMiddle_Click(object sender, EventArgs e)
-        {
-            try
+            while (current != null)
             {
-                int position = int.Parse(txtPosition.Text);
-                list.DeleteFromMiddle(position);
-                UpdateDisplay();
-            }
-            catch (FormatException)
-            {
-                MessageBox.Show("Por favor, ingrese un número válido para la posición.");
-            }
-        }
+                // Crear un ítem de ListView con la posición como primer subitem.
+                ListViewItem item = new ListViewItem(position.ToString());
 
-        private void UpdateDisplay()
-        {
-            txtData.Clear();
-            txtPosition.Clear();
-            lvDisplay.Items.Clear(); // Limpiar elementos anteriores
-            Node temp = list.GetHead(); // Asumimos que tienes un método GetHead en DoublyLinkedList
-            int position = 1;
-            while (temp != null)
-            {
-                var listViewItem = new ListViewItem(position.ToString());
-                listViewItem.SubItems.Add(temp.Data.ToString());
-                lvDisplay.Items.Add(listViewItem);
-                temp = temp.Next;
+                // Añadir el dato del nodo como segundo subitem.
+                item.SubItems.Add(current.Data.ToString());
+
+                // Agregar el ítem al ListView.
+                lvDisplay.Items.Add(item);
+
+                // Avanzar al siguiente nodo.
+                current = current.Next;
                 position++;
             }
-
         }
     }
 }
